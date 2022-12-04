@@ -1,19 +1,24 @@
 const express 	 = require("express"),
 	  app 	   	 = express(),
+      morgan     = require("morgan"),
 	  bodyParser = require("body-parser"),
       flash = require("connect-flash"),
-    //   User = require("./models/user.js"),
+      User = require("./models/user.js"),
+      Sensor = require("./models/sensor.js"),
+      Sensor_data = require("./models/sensor_data.js"),
+      path = require("path"),
       passport = require("passport"),
 	  LocalStategy = require("passport-local"),
-	  methodOverride = require("method-override"),
+	  methodOverride = require("method-override"),      
 	  sequelize = require("./util/database")
 
 //	require routes
 const indexRoutes = require("./routes/index")
 
 app.set("view engine", "ejs");
+app.use(morgan("tiny"));
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(path.join(__dirname, "/public")));
 app.use(methodOverride("_method"));
 app.use(flash());
 
@@ -48,8 +53,8 @@ app.use(function(req, res, next){
 
 app.use("/", indexRoutes);
 
-//test DB Connection
-const testDB = async function(){
+
+const testDBConnection = async function(){
 	try {
 		await sequelize.authenticate();
 	   console.log('Connection has been established successfully.');
@@ -57,6 +62,36 @@ const testDB = async function(){
 	   console.error('Unable to connect to the database:', error);
 	 }
 }
-testDB();
+testDBConnection();
+
+User.hasMany(Sensor_data, {
+    onDelete: "CASCADE",
+    foreignKey: "user_id"
+});
+
+Sensor.hasMany(Sensor_data,{
+    foreignKey: "sensor_id"
+});
+
+sequelize.sync()
+		.then((result)=> {
+			console.log("table建立完成");
+		})
+		.catch((err)=> {
+			console.log(err);
+		});
+
+// TODO: for testing only; should be removed
+app.get("/test", async (req, res) =>{
+    Sensor_data.findAll({where:{
+        user_id:1
+    }}).then(result => {        
+        return JSON.stringify(result);        
+    }).then(data => {        
+        const sensorData = JSON.parse(data);        
+        res.render("test", {sensorData});        
+    }).catch(err => console.log(err));
+});
+
 
 app.listen(process.env.PORT || 8080, process.env.IP, ()=> console.log("The Server has started!"));
