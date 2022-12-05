@@ -4,6 +4,7 @@
 -- insert into users(name, password, age) values('Sheng-Da', '$2a$12$vLSO5IsTvJ0sKyWqDivfOOJ74MPqOjRYxQJjYs2F/o529Ap8hr6gS', 20); 
 
 -- insert into sensors(sensor_type) values('acc');
+-- insert into sensors(sensor_type) values('gyro');
 
 -- drop procedure if exists dummy_sensor_data_insert;
 
@@ -43,14 +44,11 @@
 -- call dummy_sensor_data_insert(1000);
 
 
--- select * from user; 
--- select * from sensor; 
--- select * from sensor_data limit 3000;
+select * from users; 
+select * from sensors; 
+select * from sensor_data limit 3000;
 
-select * from sensor_data 
-join users
-on users.user_id = sensor_data.user_id
-where sensor_data.user_id = 1;
+
 
 
 

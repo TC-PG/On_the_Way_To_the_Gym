@@ -20,9 +20,12 @@
             <tr>
                 <th>筆數</th>
                 <th>時間</th>
-                <th>x軸</th>
-                <th>y軸</th>
-                <th>z軸</th>
+                <th>gyro_X軸</th>
+                <th>gyro_Y軸</th>
+                <th>gyro_Z軸</th>
+                <th>acc_X軸</th>
+                <th>acc_Y軸</th>
+                <th>acc_Z軸</th>
             </tr>
         </thead>
         <tbody>
@@ -31,9 +34,12 @@
                 <tr>
                     <td><%= i+1 %></td>
                     <td><%= moment(sensorData[i].instant).format("MMMM Do YYYY, h:mm:ss a") %></td>
-                    <td><%= sensorData[i].x_axis %></td>
-                    <td><%= sensorData[i].y_axis %></td>
-                    <td><%= sensorData[i].z_axis %></td>
+                    <td><%= sensorData[i].gyroX %></td>
+                    <td><%= sensorData[i].gyroY %></td>
+                    <td><%= sensorData[i].gyroZ %></td>
+                    <td><%= sensorData[i].accX %></td>
+                    <td><%= sensorData[i].accY %></td>
+                    <td><%= sensorData[i].accZ %></td>
                 </tr>                
             <% } %>
         </tbody>

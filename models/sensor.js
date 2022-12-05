@@ -5,7 +5,7 @@ const sequelize = require("../util/database");
 const Sensor = sequelize.define(
 	"sensor",
 	{
-		sensor_id: {
+		id: {
 			type: Sequelize.INTEGER,
 			autoIncrement: true,
 			allowNull: false,

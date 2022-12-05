@@ -6,14 +6,16 @@ const express 	 = require("express"),
       User = require("./models/user.js"),
       Sensor = require("./models/sensor.js"),
       Sensor_data = require("./models/sensor_data.js"),
+      SensorToData = require("./models/sensorToData"),
       path = require("path"),
       passport = require("passport"),
 	  LocalStategy = require("passport-local"),
 	  methodOverride = require("method-override"),      
-	  sequelize = require("./util/database")
+	  sequelize = require("./util/database"),
+      seedDB = require("./util/seedDB")
 
 //	require routes
-const indexRoutes = require("./routes/index")
+const indexRoutes = require("./routes/index");
 
 app.set("view engine", "ejs");
 app.use(morgan("tiny"));
@@ -69,29 +71,122 @@ User.hasMany(Sensor_data, {
     foreignKey: "user_id"
 });
 
-Sensor.hasMany(Sensor_data,{
+/* TODO: remove*/
+// Sensor.hasMany(Sensor_data,{
+//     foreignKey: "sensor_id"
+// });
+
+/* TODO: remove*/
+// Sensor.belongsToMany(Sensor_data,{
+//     through: SensorToData,
+//     sourceKey: 'id',
+//     targetKey: 'id'
+// });
+
+Sensor.belongsToMany(Sensor_data,{
+    through: SensorToData,
+    sourceKey: 'id',
     foreignKey: "sensor_id"
 });
 
+Sensor_data.belongsToMany(Sensor,{
+    through: SensorToData,
+    sourceKey: 'id',
+    foreignKey: 'sensor_data_id'
+});
+
 sequelize.sync()
-		.then((result)=> {
-			console.log("table建立完成");
+		.then(async (result)=> {
+            /* TODO: test data insertion; should be commented out after server startup */
+            // await seedDB(); 
+			console.log("table以及假資料建立完成");
 		})
 		.catch((err)=> {
 			console.log(err);
 		});
 
-// TODO: for testing only; should be removed
-app.get("/test", async (req, res) =>{
-    Sensor_data.findAll({where:{
-        user_id:1
-    }}).then(result => {        
-        return JSON.stringify(result);        
-    }).then(data => {        
-        const sensorData = JSON.parse(data);        
-        res.render("test", {sensorData});        
-    }).catch(err => console.log(err));
+
+/* TODO: for testing only; should be removed */
+app.get("/test", async (req, res) =>{ 
+    const result = await Sensor_data.findAll({
+        include: Sensor,
+        where:{
+            // instant: '2022-12-05 12:48:42'
+            user_id: 1
+        }
+        
+    });
+    
+    const resultString = JSON.stringify(result);
+    const resultobj = JSON.parse(resultString);
+
+    /* 整理資料庫中屬於同一筆的加速度及陀螺儀感測資料*/
+    const outerArr = [];    
+    const size = resultobj.length / 2;     
+    for(let i = 0; i< size; i++){
+        let id_1 = getRelationID(resultobj,i);
+        for(let j = size; j < resultobj.length; j++){
+            let id_2 = getRelationID(resultobj,j);
+            let innerArr = [];
+            if(id_1 === id_2){                
+                innerArr.push(resultobj[i]);
+                innerArr.push(resultobj[j]);
+                outerArr.push(innerArr);                
+            }
+        }        
+    }    
+    
+    const sensorData = [];
+    for(let i = 0; i < outerArr.length; i++){
+        let temp = {};
+        for(let j = 0; j < outerArr[i].length; j++){
+            let sensorDataItem = outerArr[i][j];
+            temp.instant = sensorDataItem.instant;
+            let sensor = sensorDataItem.sensors[0];
+            let sensor_type = sensor.sensor_type;
+            
+            if(sensor_type === 'gyro'){
+                temp.gyroX = sensorDataItem.x_axis;
+                temp.gyroY = sensorDataItem.y_axis;
+                temp.gyroZ = sensorDataItem.z_axis;
+            }else{
+                temp.accX = sensorDataItem.x_axis;
+                temp.accY = sensorDataItem.y_axis;
+                temp.accZ = sensorDataItem.z_axis;
+            }
+        }        
+        sensorData.push(temp);
+    }
+
+    res.render("test", {sensorData});
+    // res.send(JSON.stringify(result))
+
+    // SensorToData.findAll()
+    //             .then(result => {
+                                
+    //                     return JSON.stringify(result);        
+    //             }).then(data => {        
+    //                 const SensorToData = JSON.parse(data);  
+    //                 console.log(SensorToData)      
+    //                 // res.render("test", {sensorData});        
+    //             }).catch(err => console.log(err));
+
 });
 
+const getRelationID = (resultobj, n) =>{
+    const sensor = resultobj[n].sensors;    
+    const SensorToData = sensor[0].SensorToData;
+    return SensorToData.relationID;
+}
+
+// const getData = () => {
+//      User.findByPk(1)
+//     .then( (user) => {
+//          return  user.getSensor_data();
+//     })
+//     .then(data => console.log(data[0].x_axis))   
+//     .catch(err => console.log(err));
+// }
+// getData()
 
 app.listen(process.env.PORT || 8080, process.env.IP, ()=> console.log("The Server has started!"));
