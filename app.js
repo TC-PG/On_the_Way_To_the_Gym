@@ -20,6 +20,7 @@ const express 	 = require("express"),
 const indexRoutes = require("./routes/index");
 
 app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "/views"));
 app.use(morgan("tiny"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(expressSanitizer());
