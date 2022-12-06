@@ -7,7 +7,7 @@ const sequelize = new Sequelize(process.env.DATABASE, process.env.DATABASE_USER_
     dialect: process.env.DATABASE_DIALECT,
     timezone: '+08:00',
     dialectOptions: {
-      useUTC: false, //for reading from database
+      // useUTC: false, //for reading from database
       dateStrings: true,
       typeCast: true
     }

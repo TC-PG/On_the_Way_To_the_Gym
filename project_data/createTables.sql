@@ -29,13 +29,17 @@
 -- FOREIGN KEY(user_id) REFERENCES Users(user_id)	ON DELETE CASCADE
 -- );
 
-show tables; 
+
 
 SET FOREIGN_KEY_CHECKS = 0;
 drop table IF EXISTS Sensors;
 drop table IF EXISTS Users;
 drop table IF EXISTS Sensor_data;
+drop table IF EXISTS sensortodata;
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+show tables; 
 
 
 

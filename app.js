@@ -2,6 +2,7 @@ const express 	 = require("express"),
 	  app 	   	 = express(),
       morgan     = require("morgan"),
 	  bodyParser = require("body-parser"),
+      expressSanitizer = require('express-sanitizer'),
       flash = require("connect-flash"),
       User = require("./models/user.js"),
       Sensor = require("./models/sensor.js"),
@@ -12,7 +13,8 @@ const express 	 = require("express"),
 	  LocalStategy = require("passport-local"),
 	  methodOverride = require("method-override"),      
 	  sequelize = require("./util/database"),
-      seedDB = require("./util/seedDB")
+      seedDB = require("./util/seedDB"),
+      { Op } = require("sequelize")
 
 //	require routes
 const indexRoutes = require("./routes/index");
@@ -20,6 +22,7 @@ const indexRoutes = require("./routes/index");
 app.set("view engine", "ejs");
 app.use(morgan("tiny"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(expressSanitizer());
 app.use(express.static(path.join(__dirname, "/public")));
 app.use(methodOverride("_method"));
 app.use(flash());
@@ -106,13 +109,29 @@ sequelize.sync()
 		});
 
 
-/* TODO: for testing only; should be removed */
-app.get("/test", async (req, res) =>{ 
+/* get user's sensor data for given time interval */
+app.get("/data", async (req, res) =>{    
+    console.log(req.query)
+    const startDate = req.query.txtStartDate;
+    const startTime = req.query.txtStartTime;
+    const endDate = req.query.txtEndDate;
+    const endTime = req.query.txtEndTime;
+    let begin = '2022-12-05';
+    let end = '2022-12-06';
+    if(startDate && startTime && endDate && endTime){
+        try{
+            begin = startDate.concat(' ', startTime);
+            end = endDate.concat(' ', endTime);
+        }catch(err){
+            console.log(err);
+        }
+    }
+    
     const result = await Sensor_data.findAll({
         include: Sensor,
         where:{
-            // instant: '2022-12-05 12:48:42'
-            user_id: 1
+            instant: {[Op.between]: [begin, end]},
+            user_id: 1 //TODO: should plug in real user id
         }
         
     });
@@ -158,18 +177,8 @@ app.get("/test", async (req, res) =>{
         sensorData.push(temp);
     }
 
-    res.render("test", {sensorData});
-    // res.send(JSON.stringify(result))
-
-    // SensorToData.findAll()
-    //             .then(result => {
-                                
-    //                     return JSON.stringify(result);        
-    //             }).then(data => {        
-    //                 const SensorToData = JSON.parse(data);  
-    //                 console.log(SensorToData)      
-    //                 // res.render("test", {sensorData});        
-    //             }).catch(err => console.log(err));
+    // res.render("test", {sensorData});
+    return res.status(200).json(sensorData);   
 
 });
 
@@ -178,6 +187,11 @@ const getRelationID = (resultobj, n) =>{
     const SensorToData = sensor[0].SensorToData;
     return SensorToData.relationID;
 }
+
+// TODO: for testing
+app.get("/test", (req, res) => {
+    res.render("test", {});
+})
 
 // const getData = () => {
 //      User.findByPk(1)
