@@ -190,18 +190,9 @@ const getRelationID = (resultobj, n) =>{
 }
 
 // TODO: for testing
-app.get("/test", (req, res) => {
-    res.render("test", {});
-})
+// app.get("/index", (req, res) => {
+//     res.render("index", {});
+// })
 
-// const getData = () => {
-//      User.findByPk(1)
-//     .then( (user) => {
-//          return  user.getSensor_data();
-//     })
-//     .then(data => console.log(data[0].x_axis))   
-//     .catch(err => console.log(err));
-// }
-// getData()
 
 app.listen(process.env.PORT || 8080, process.env.IP, ()=> console.log("The Server has started!"));
