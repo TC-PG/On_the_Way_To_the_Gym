@@ -15,6 +15,7 @@ const express 	 = require("express"),
 	  sequelize = require("./util/database"),
       seedDB = require("./util/seedDB"),
       { Op } = require("sequelize")
+      
 
 //	require routes
 const indexRoutes = require("./routes/index");
@@ -189,10 +190,6 @@ const getRelationID = (resultobj, n) =>{
     return SensorToData.relationID;
 }
 
-// TODO: for testing
-// app.get("/index", (req, res) => {
-//     res.render("index", {});
-// })
 
 
 app.listen(process.env.PORT || 8080, process.env.IP, ()=> console.log("The Server has started!"));

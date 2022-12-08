@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const { PythonShell} = require('python-shell')
 // const User = require("../models/user");
 // const middleware = require("../middleware");
 
@@ -28,7 +29,21 @@ router.get("/Run", (req, res) => {
 })
 
 
+// TODO: for testing
+router.get("/test", async (req, res) => {
+    PythonShell.run('./util/plot_test.py', null, function (err) {
+        if (err) {
+            console.log(err);
+        }
+      });
+    await sleep(1700);
+    res.render("test", {});
+})
 
+const sleep = (time) => {
+    return new Promise(resolve => setTimeout(resolve, time));
+  } 
+  
 
 
 
