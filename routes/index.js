@@ -15,25 +15,25 @@ router.get("/index", (req, res) => {
 
 router.get("/JumpRope", async (req, res) => {
     PlotUtil.plot('test_fix_acc_1.csv', 'jump');
-    await PlotUtil.sleep(1700);
+    await PlotUtil.sleep(2000);
     res.render("JumpRope");
 })
 
 router.get("/Bike", async (req, res) => {
     PlotUtil.plot('test_fix_acc_2.csv', 'bike');
-    await PlotUtil.sleep(1700);
+    await PlotUtil.sleep(2000);
     res.render("Bike");
 })
 
 router.get("/Kettlebell", async (req, res) => {
     PlotUtil.plot('test_fix_acc_3.csv', 'kettlebell');
-    await PlotUtil.sleep(1700);
+    await PlotUtil.sleep(2000);
     res.render("Kettlebell");
 })
 
 router.get("/Run", async (req, res) => {
     PlotUtil.plot('test_fix_acc_4.csv', 'run');
-    await PlotUtil.sleep(1700);
+    await PlotUtil.sleep(2000);
     res.render("Run");
 })
 

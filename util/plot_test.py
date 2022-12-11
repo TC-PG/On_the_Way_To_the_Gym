@@ -5,17 +5,23 @@ import math
 import numpy as np
 from scipy.signal import find_peaks
 import difflib
+
 import sys
 
-### 3D scatter plot ###
 args = sys.argv
+
+### 3D scatter plot ###
+
 #df_gyro = pd.read_csv (r'./test_fix_gyro.csv')
+#df_acc = pd.read_csv (r'./test_fix_acc.csv')
 df_acc = pd.read_csv (rf'./project_data/dataset/{args[1]}')
 
 print(df_acc)
 
-fig = plt.figure()
-ax = fig.add_subplot(projection='3d')
+#fig = plt.figure(figsize=(10, 4), dpi=200) #horizontal
+#ax = fig.add_subplot(121, projection='3d') #horizontal
+fig = plt.figure(figsize=(6, 9), dpi=200)  #vertical
+ax = fig.add_subplot(211, projection='3d') #vertical
 
 """
 ax.scatter(df_gyro['gyroX'], df_gyro['gyroY'], df_gyro['gyroZ'])
@@ -31,9 +37,10 @@ ax.set_xlabel('accX')
 ax.set_ylabel('accY')
 ax.set_zlabel('accZ')
 
+plt.title("Acceleration Distribution")
 #plt.show()
 #plt.savefig('./gyro_scatter.png')
-plt.savefig(f'./public/acc_scatter_test_{args[2]}.png')
+#plt.savefig('./acc_scatter_test.png')
 
 
 ### counting steps ###
@@ -97,12 +104,22 @@ peaks = find_peaks(magNoG_list, height = -1, threshold = 0, distance = 1)
 height = peaks[1]['peak_heights']
 peak_pos = x[peaks[0]]
 
-fig_2 = plt.figure()
-ax_2 = fig_2.subplots()
+#fig_2 = plt.figure()
+#ax_2 = fig_2.subplots()
+#ax_2 = fig.add_subplot(122) #horizontal
+ax_2 = fig.add_subplot(212) #vertical
 ax_2.plot(x, magNoG_list)
 ax_2.scatter(peak_pos, height, color = 'r', s = 15, marker = 'D')
 ax_2.grid()
+
+plt.xlabel("Time (s)")
+plt.ylabel("Acceleration Magnitude, No Gravity (m/s\u00b2)")
 plt.title("Number of Times = " + str(len(peak_pos)))
+
+#fig.tight_layout() #horizontal
+fig.tight_layout(pad = 3) #vertical
+
 #plt.show()
-plt.savefig(f'./public/acc_linechart_test_{args[2]}.png')
+#plt.savefig('./acc_linechart_test.png')
+plt.savefig(f'./public/acc_mergechart_test_{args[2]}.png')
 
