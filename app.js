@@ -19,6 +19,7 @@ const express 	 = require("express"),
 
 //	require routes
 const indexRoutes = require("./routes/index");
+const linebotRoute = require("./routes/linebot");
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "/views"));
@@ -59,6 +60,7 @@ app.use(function(req, res, next){
 });
 
 app.use("/", indexRoutes);
+app.use("/webhook", linebotRoute);
 
 
 const testDBConnection = async function(){
